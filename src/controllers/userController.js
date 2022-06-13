@@ -4,7 +4,7 @@ const { User } = require('../database/models');
 
 const SECRET = process.env.JWT_SECRET;
 
-async function createUser(req, res) {
+async function createUser(req, res, next) {
   const { displayName, email, password, image } = req.body;
  
   const [, created] = await User.findOrCreate({ 
@@ -13,8 +13,8 @@ async function createUser(req, res) {
   });
 
   if (!created) {
-    res.status(409).json({ message: 'User already registered' });
-  } else {
+    return next({ status: 409, message: 'User already registered' });
+  } 
     const jwtConfig = {
       expiresIn: '7d',
     };
@@ -22,7 +22,6 @@ async function createUser(req, res) {
     const token = jwt.sign({ displayName, email, image }, SECRET, jwtConfig);
     
     res.status(201).json({ token });
-  } 
 }
 
 async function getAll(_req, res) {
