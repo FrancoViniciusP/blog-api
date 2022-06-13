@@ -25,6 +25,12 @@ async function createUser(req, res) {
   } 
 }
 
-  module.exports = {
-    createUser,
-  };
+async function getAll(_req, res) {
+  const users = await User.findAll({ attributes: { exclude: 'password' } });
+  res.status(200).json(users);
+}
+
+module.exports = {
+  createUser,
+  getAll,
+};
