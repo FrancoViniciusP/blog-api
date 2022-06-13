@@ -5,7 +5,6 @@ const { User } = require('../database/models');
 const SECRET = process.env.JWT_SECRET;
 
 module.exports = async (req, res) => {
-  console.log('entrou');
   const { email, password } = req.body;
         
   const result = await User.findOne({ 
@@ -13,7 +12,7 @@ module.exports = async (req, res) => {
     attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
   });
   if (!result) {
-   res.status(400).json({ message: 'Invalid fields' });
+    res.status(400).json({ message: 'Invalid fields' });
   } else {
     const jwtConfig = {
       expiresIn: '7d',

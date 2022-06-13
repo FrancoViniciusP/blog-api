@@ -16,7 +16,9 @@ const UserSchema = (sequelize, DataTypes) => {
     },
     image: {
       type: DataTypes.STRING,
-    }
+    },
+  }, {
+    timestamps: false
   });
 
   return UserTable;
