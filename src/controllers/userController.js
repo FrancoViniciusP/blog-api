@@ -30,7 +30,18 @@ async function getAll(_req, res) {
   res.status(200).json(users);
 }
 
+async function getById(req, res, next) {
+  const { id } = req.params;
+  const user = await User.findByPk(id, { attributes: { exclude: 'password' } });
+  if (!user) {
+   return next({ status: 404, message: 'User does not exist' });
+  }
+
+  res.status(200).json(user);
+}
+
 module.exports = {
   createUser,
   getAll,
+  getById,
 };
