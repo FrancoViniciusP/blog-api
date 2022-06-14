@@ -19,13 +19,15 @@ const BlogPostSchema = (sequelize, DataTypes) => {
           foreignKey: true,
         },
         published: {
-          type: 'TIMESTAMP'
+          type: DataTypes.DATE,
+          defaultValue: DataTypes.NOW,
         },
         updated: {
-          type: 'TIMESTAMP'
-        } 
+          type: DataTypes.DATE,
+          defaultValue: DataTypes.NOW,
+        }
       }, {
-      timestamps: false
+      timestamps: false,
     });
 
     BlogPostTable.associate = (models) => {

@@ -17,10 +17,12 @@ module.exports = async (req, res, next) => {
     const result = await User.findOne({ 
       where: { email: data.email },
     });
-      
+    
     if (!result) {
       next({ status: 401, message: 'Expired or invalid token' });
     }
+
+    req.body.userId = result.id;
       
     next();
   } catch (e) {

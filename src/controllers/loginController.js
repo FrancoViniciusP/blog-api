@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
     where: { email, password }, 
     attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
   });
+  console.log("resultado: ",result);
   if (!result) {
     res.status(400).json({ message: 'Invalid fields' });
   } else {
