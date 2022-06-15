@@ -50,8 +50,38 @@ async function getPostById(req, res, next) {
   res.status(200).json(result);
 }
 
+async function editPostById(req, res, next) {
+  const { id } = req.params;
+  const { title, content, userId } = req.body;
+
+  await BlogPost.update({ title, content }, { where: { id, userId } });
+
+  const result = await BlogPost.findByPk(id, { include: [
+    { model: User, as: 'user', attributes: { exclude: ['password'] } },
+    { model: Category, as: 'categories', through: { attributes: [] } },
+   ] });  
+
+  if (!result) return next({ status: 404, message: 'Post does not exist' });
+   
+  res.status(200).json(result);
+}
+
+async function deletePostById(req, res, next) {
+  const { id } = req.params;
+  const { userId } = req.body;
+  
+  const result = await BlogPost.findByPk(id);
+   if (!result) return next({ status: 404, message: 'Post does not exist' });
+   if (result.userId !== userId) return next({ status: 401, message: 'Unauthorized user' });
+   await BlogPost.destroy({ where: { id, userId } });
+    
+    res.status(204).json();
+}
+
 module.exports = {
   createPost,
   getAllPosts,
   getPostById,
+  editPostById,
+  deletePostById,
 };

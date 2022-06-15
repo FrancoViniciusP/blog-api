@@ -39,8 +39,17 @@ async function getById(req, res, next) {
   res.status(200).json(user);
 }
 
+async function deleteUser(req, res) {
+  const { userId: id } = req.body;
+
+  await User.destroy({ where: { id } });
+ 
+  res.status(204).json();
+}
+
 module.exports = {
   createUser,
   getAll,
   getById,
+  deleteUser,
 };

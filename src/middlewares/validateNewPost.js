@@ -1,5 +1,5 @@
 const Joi = require('joi');
-// const { getAllCategories } = require('../controllers/categoryController');
+
 const { Category } = require('../database/models');
 
 const postModel = Joi.object({
