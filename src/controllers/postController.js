@@ -1,22 +1,43 @@
 require('dotenv').config();
-const { BlogPost, PostCategory } = require('../database/models');
+const Sequelize = require('sequelize');
+const config = require('../database/config/config');
+const { BlogPost, PostCategory, User, Category } = require('../database/models');
+
+const sequelize = new Sequelize(config.development);
 
 async function createPost(req, res) {
   const { categoryIds } = req.body;
-  const result = await BlogPost.create({ ...req.body });
+ 
+  try {
+   const result = await sequelize.transaction(async (t) => {
+      const post = await BlogPost.create({ ...req.body }, { transaction: t });
+      
+      const promises = [];
 
-  await categoryIds.forEach((id) => PostCategory.create({postId: result.id, categoryId: id}));
-
-  
-  res.status(201).json(result);
+      categoryIds.forEach((categoryId) => {
+        promises.push(PostCategory.create({ postId: post.id, categoryId }, { transaction: t }));
+      }); 
+      
+      await Promise.all(promises);
+      
+      return post;
+    });
+    res.status(201).json(result);
+  } catch (e) {
+    res.status(400).json(e.message);
+  }
 }
 
-async function getAllCategories(req, res) {
-    const categories = await Category.findAll();
-    res.status(200).json(categories);
+async function getAllPosts(req, res) {
+  const result = await BlogPost.findAll({ include: [
+    { model: User, as: 'user', attributes: { exclude: ['password'] } },
+    { model: Category, as: 'categories', through: { attributes: [] } },
+   ] });
+   
+  res.status(200).json(result);
 }
 
 module.exports = {
   createPost,
-  getAllCategories,
+  getAllPosts,
 };

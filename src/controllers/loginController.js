@@ -11,16 +11,14 @@ module.exports = async (req, res) => {
     where: { email, password }, 
     attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
   });
-  console.log("resultado: ",result);
-  if (!result) {
-    res.status(400).json({ message: 'Invalid fields' });
-  } else {
-    const jwtConfig = {
+
+  if (!result) res.status(400).json({ message: 'Invalid fields' });
+   
+  const jwtConfig = {
       expiresIn: '7d',
     };
     
     const token = jwt.sign({ data: result }, SECRET, jwtConfig);
     
     res.status(200).json({ token });
-  }
-  };
+};
