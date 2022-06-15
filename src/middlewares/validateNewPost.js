@@ -12,7 +12,7 @@ const postModel = Joi.object({
 module.exports = async (req, _res, next) => {
   const { error } = postModel.validate(req.body);
 
-  if (error) next({ status: 400, message: 'Some required fields are missing' });
+  if (error) return next({ status: 400, message: 'Some required fields are missing' });
 
   try {
     const { categoryIds } = req.body;
