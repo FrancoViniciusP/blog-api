@@ -1,55 +1,41 @@
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const { User } = require('../database/models');
+const service = require('../services/userService');
 
-const SECRET = process.env.JWT_SECRET;
+async function create(req, res, next) {
+  const userToken = await service.createUser(req.body);
 
-async function createUser(req, res, next) {
-  const { displayName, email, password, image } = req.body;
- 
-  const [, created] = await User.findOrCreate({ 
-    where: { email },
-    defaults: { displayName, password, image },
-  });
-
-  if (!created) {
+  if (!userToken) {
     return next({ status: 409, message: 'User already registered' });
   } 
-    const jwtConfig = {
-      expiresIn: '7d',
-    };
-        
-    const token = jwt.sign({ displayName, email, image }, SECRET, jwtConfig);
-    
-    res.status(201).json({ token });
+   
+  res.status(201).json({ token: userToken });
 }
 
 async function getAll(_req, res) {
-  const users = await User.findAll({ attributes: { exclude: 'password' } });
+  const users = await service.getAllUsers();
+
   res.status(200).json(users);
 }
 
 async function getById(req, res, next) {
   const { id } = req.params;
-  const user = await User.findByPk(id, { attributes: { exclude: 'password' } });
-  if (!user) {
-   return next({ status: 404, message: 'User does not exist' });
-  }
+  const user = await service.getUserById(id);
+
+  if (!user) return next({ status: 404, message: 'User does not exist' });
 
   res.status(200).json(user);
 }
 
-async function deleteUser(req, res) {
-  const { userId: id } = req.body;
+async function destroy(req, res) {
+  const { userId } = req.body;
 
-  await User.destroy({ where: { id } });
+  await service.deleteUser(userId);
  
   res.status(204).json();
 }
 
 module.exports = {
-  createUser,
+  create,
   getAll,
   getById,
-  deleteUser,
+  destroy,
 };
