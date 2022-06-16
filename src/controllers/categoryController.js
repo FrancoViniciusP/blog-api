@@ -1,10 +1,6 @@
 const service = require('../services/categoryService');
 
-async function create(req, res, next) {
-  if (!req.body.name) {
-    return next({ status: 400, message: '"name" is required' });
-  } 
-  
+async function create(req, res) {
   const { name } = req.body;
 
   const created = await service.createCategory(name);
