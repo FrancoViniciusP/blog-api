@@ -1,17 +1,19 @@
+const { STATUS, MESSAGES } = require('../helpers/constants');
+
 module.exports = (req, _res, next) => {
   try {
     const { email, password, displayName } = req.body;
     if (displayName.length < 8) {
-      next({ status: 400, message: '"displayName" length must be at least 8 characters long' });
+      next({ status: STATUS.BAD_REQUEST, message: MESSAGES.ERROR_DISPLAY_NAME });
     }
     if (!email.match(/\S+@\S+\.\S+/)) {
-      next({ status: 400, message: '"email" must be a valid email' });
+      next({ status: STATUS.BAD_REQUEST, message: MESSAGES.ERROR_EMAIL });
     }
     if (password.length < 6) {
-      next({ status: 400, message: '"password" length must be at least 6 characters long' });
+      next({ status: STATUS.BAD_REQUEST, message: MESSAGES.ERROR_PASSWORD });
     }
     next();
   } catch (e) {
-    next({ status: 400, message: 'Some required fields are missing' });
+    next({ status: STATUS.BAD_REQUEST, message: MESSAGES.FIELD_MISSED });
   }
 };

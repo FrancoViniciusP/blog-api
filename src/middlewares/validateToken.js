@@ -1,11 +1,14 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { User } = require('../database/models');
+const { MESSAGES, STATUS } = require('../helpers/constants');
 
 const SECRET = process.env.JWT_SECRET;
 
-module.exports = async (req, res, next) => {
-  if (!req.headers.authorization) return next({ status: 401, message: 'Token not found' });
+module.exports = async (req, _res, next) => {
+  if (!req.headers.authorization) {
+    return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_MISSED }); 
+  }
 
   try {
     const token = req.headers.authorization;
@@ -14,12 +17,12 @@ module.exports = async (req, res, next) => {
       
     const result = await User.findOne({ where: { email: data.email } });
     
-    if (!result) return next({ status: 401, message: 'Expired or invalid token' });
+    if (!result) return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_MISSED });
 
     req.body.userId = result.id;
       
     next();
   } catch (e) {
-    return next({ status: 401, message: 'Expired or invalid token' });
+    return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_MISSED });
   }
 };
