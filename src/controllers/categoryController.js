@@ -13,7 +13,7 @@ async function create(req, res, next) {
 }
 
 async function getAll(_req, res) {
-    const categories = service.getAllCategories();
+    const categories = await service.getAllCategories();
 
     res.status(200).json(categories);
 }

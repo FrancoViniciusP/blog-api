@@ -1,109 +1,63 @@
-require('dotenv').config();
-const Sequelize = require('sequelize');
-const { Op } = require('sequelize');
-const config = require('../database/config/config');
-const { BlogPost, PostCategory, User, Category } = require('../database/models');
+const service = require('../services/postService');
 
-const sequelize = new Sequelize(config.development);
-
-async function createPost(req, res) {
-  const { categoryIds } = req.body;
+async function create(req, res) {
+  const newPost = await service.createPost(req.body);
  
-  try {
-   const result = await sequelize.transaction(async (t) => {
-      const post = await BlogPost.create({ ...req.body }, { transaction: t });
-      
-      const promises = [];
-
-      categoryIds.forEach((categoryId) => {
-        promises.push(PostCategory.create({ postId: post.id, categoryId }, { transaction: t }));
-      }); 
-      
-      await Promise.all(promises);
-      
-      return post;
-    });
-    res.status(201).json(result);
-  } catch (e) {
-    res.status(400).json(e.message);
-  }
+  res.status(201).json(newPost);
 }
 
-async function getAllPosts(req, res) {
-  const result = await BlogPost.findAll({ include: [
-    { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    { model: Category, as: 'categories', through: { attributes: [] } },
-   ] });
+async function getAll(req, res) {
+  const allPosts = await service.getAllPosts();
    
-  res.status(200).json(result);
+  res.status(200).json(allPosts);
 }
 
-async function getPostById(req, res, next) {
+async function getById(req, res, next) {
   const { id } = req.params;
 
-  const result = await BlogPost.findByPk(id, { include: [
-    { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    { model: Category, as: 'categories', through: { attributes: [] } },
-   ] });
+  const post = await service.getPostById(id);
 
-  if (!result) return next({ status: 404, message: 'Post does not exist' });
+  if (!post) return next({ status: 404, message: 'Post does not exist' });
    
-  res.status(200).json(result);
+  res.status(200).json(post);
 }
 
-async function editPostById(req, res, next) {
+async function edit(req, res, _next) {
   const { id } = req.params;
-  const { title, content, userId } = req.body;
+  
+  const editedPost = await service.editPostById(req.body, id);
 
-  await BlogPost.update({ title, content }, { where: { id, userId } });
-
-  const result = await BlogPost.findByPk(id, { include: [
-    { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    { model: Category, as: 'categories', through: { attributes: [] } },
-   ] });  
-
-  if (!result) return next({ status: 404, message: 'Post does not exist' });
-   
-  res.status(200).json(result);
+  res.status(200).json(editedPost);
 }
 
-async function deletePostById(req, res, next) {
+async function destroy(req, res, next) {
   const { id } = req.params;
   const { userId } = req.body;
   
-  const result = await BlogPost.findByPk(id);
-   if (!result) return next({ status: 404, message: 'Post does not exist' });
-   if (result.userId !== userId) return next({ status: 401, message: 'Unauthorized user' });
-   await BlogPost.destroy({ where: { id, userId } });
+  const post = await service.getPostById(id);
+  if (!post) return next({ status: 404, message: 'Post does not exist' });
+  if (post.userId !== userId) return next({ status: 401, message: 'Unauthorized user' });
+   
+  await service.deletePostById(id, userId);
     
-    res.status(204).json();
+  res.status(204).json();
 }
 
-async function getByTerm(req, res, next) {
+async function search(req, res, next) {
   const { q } = req.query;
 
-  const result = await BlogPost.findAll({
-    where: { 
-      [Op.or]: [
-        { title: { [Op.like]: `%${q}%` } }, 
-        { content: { [Op.like]: `%${q}%` } },
-      ] },  
-    include: [
-      { model: User, as: 'user', attributes: { exclude: ['password'] } },
-      { model: Category, as: 'categories', through: { attributes: [] } },
-    ], 
-  });
+  const postsFound = await service.searchByTerm(q);
 
-  if (!result) return next({ status: 404, message: 'Post does not exist' });
+  if (!postsFound) return next({ status: 404, message: 'Post does not exist' });
    
-  res.status(200).json(result);
+  res.status(200).json(postsFound);
 }
 
 module.exports = {
-  createPost,
-  getAllPosts,
-  getPostById,
-  editPostById,
-  deletePostById,
-  getByTerm,
+  create,
+  getAll,
+  getById,
+  edit,
+  destroy,
+  search,
 };

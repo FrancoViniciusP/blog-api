@@ -1,16 +1,16 @@
 const express = require('express');
-const postController = require('../controllers/postController');
+const post = require('../controllers/postController');
 const validateEdition = require('../middlewares/validateEdition');
 const validateNewPost = require('../middlewares/validateNewPost');
 const validateToken = require('../middlewares/validateToken');
 
 const router = express.Router();
 
-router.post('/', validateToken, validateNewPost, postController.createPost);
-router.get('/', validateToken, postController.getAllPosts);
-router.get('/search', validateToken, postController.getByTerm);
-router.get('/:id', validateToken, postController.getPostById);
-router.put('/:id', validateToken, validateEdition, postController.editPostById);
-router.delete('/:id', validateToken, postController.deletePostById);
+router.post('/', validateToken, validateNewPost, post.create);
+router.get('/', validateToken, post.getAll);
+router.get('/search', validateToken, post.search);
+router.get('/:id', validateToken, post.getById);
+router.put('/:id', validateToken, validateEdition, post.edit);
+router.delete('/:id', validateToken, post.destroy);
 
 module.exports = router; 
