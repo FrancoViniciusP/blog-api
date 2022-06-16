@@ -1,3 +1,4 @@
+const { STATUS, MESSAGES } = require('../helpers/constants');
 const service = require('../services/postService');
 
 async function create(req, res) {
@@ -17,7 +18,7 @@ async function getById(req, res, next) {
 
   const post = await service.getPostById(id);
 
-  if (!post) return next({ status: 404, message: 'Post does not exist' });
+  if (!post) return next({ status: STATUS.NOT_FOUND, message: MESSAGES.POST_MISSED });
    
   res.status(200).json(post);
 }
@@ -35,8 +36,12 @@ async function destroy(req, res, next) {
   const { userId } = req.body;
   
   const post = await service.getPostById(id);
-  if (!post) return next({ status: 404, message: 'Post does not exist' });
-  if (post.userId !== userId) return next({ status: 401, message: 'Unauthorized user' });
+
+  if (!post) return next({ status: STATUS.NOT_FOUND, message: MESSAGES.POST_MISSED });
+
+  if (post.userId !== userId) {
+    return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.NOT_AUTHORIZED }); 
+  }
    
   await service.deletePostById(id, userId);
     
@@ -48,7 +53,7 @@ async function search(req, res, next) {
 
   const postsFound = await service.searchByTerm(q);
 
-  if (!postsFound) return next({ status: 404, message: 'Post does not exist' });
+  if (!postsFound) return next({ status: STATUS.NOT_FOUND, message: MESSAGES.POST_MISSED });
    
   res.status(200).json(postsFound);
 }
