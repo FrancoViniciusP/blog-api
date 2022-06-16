@@ -17,12 +17,12 @@ module.exports = async (req, _res, next) => {
       
     const result = await User.findOne({ where: { email: data.email } });
     
-    if (!result) return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_MISSED });
+    if (!result) return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_INVALID });
 
     req.body.userId = result.id;
       
     next();
   } catch (e) {
-    return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_MISSED });
+    return next({ status: STATUS.UNAUTHORIZED, message: MESSAGES.TOKEN_INVALID });
   }
 };

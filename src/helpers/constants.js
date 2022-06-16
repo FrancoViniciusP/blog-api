@@ -8,11 +8,11 @@ const STATUS = {
 };
 
 const MESSAGES = {
-  INVALID_TOKEN: 'Expired or invalid token',
+  TOKEN_INVALID: 'Expired or invalid token',
   TOKEN_MISSED: 'Token not found',
   FIELD_MISSED: 'Some required fields are missing',
   NAME_MISSED: '"name" is required',
-  NOT_AUTHORIZED: 'Unauthorized user',
+  POST_MISSED: 'Post does not exist',
   ERROR_DISPLAY_NAME: '"displayName" length must be at least 8 characters long',
   ERROR_EMAIL: '"email" must be a valid email',
   ERROR_PASSWORD: '"password" length must be at least 6 characters long',
@@ -20,7 +20,7 @@ const MESSAGES = {
   ERROR_USER: 'User does not exist',
   USER_EXISTS: 'User already registered',
   INVALID_FIELDS: 'Invalid fields',
-  POST_MISSED: 'Post does not exist',
+  NOT_AUTHORIZED: 'Unauthorized user',
 };
 
 module.exports = {

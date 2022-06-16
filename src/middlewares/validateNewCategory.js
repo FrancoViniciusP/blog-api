@@ -2,7 +2,7 @@ const Joi = require('joi');
 const { STATUS, MESSAGES } = require('../helpers/constants');
 
 const categoryPattern = Joi.object({
-  Name: Joi.string().min(1).required(),
+  name: Joi.string().min(1).required(),
   userId: Joi.required(),
 });
 
