@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Sequelize = require('sequelize');
+const { Op } = require('sequelize');
 const config = require('../database/config/config');
 const { BlogPost, PostCategory, User, Category } = require('../database/models');
 
@@ -78,10 +79,31 @@ async function deletePostById(req, res, next) {
     res.status(204).json();
 }
 
+async function getByTerm(req, res, next) {
+  const { q } = req.query;
+
+  const result = await BlogPost.findAll({
+    where: { 
+      [Op.or]: [
+        { title: { [Op.like]: `%${q}%` } }, 
+        { content: { [Op.like]: `%${q}%` } },
+      ] },  
+    include: [
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Category, as: 'categories', through: { attributes: [] } },
+    ], 
+  });
+
+  if (!result) return next({ status: 404, message: 'Post does not exist' });
+   
+  res.status(200).json(result);
+}
+
 module.exports = {
   createPost,
   getAllPosts,
   getPostById,
   editPostById,
   deletePostById,
+  getByTerm,
 };

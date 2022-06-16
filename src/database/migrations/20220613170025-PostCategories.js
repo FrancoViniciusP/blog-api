@@ -9,7 +9,7 @@ module.exports = {
         onDelete: 'CASCADE',
         allowNull: false,
         references: {
-          model: 'BlogPosts',
+          model: 'Users',
           key: 'id'
         },
         primaryKey: true,
@@ -25,13 +25,10 @@ module.exports = {
         },
         primaryKey: true,
       }
-    }, {
-        timestamps: false,
-        freezeTableName: true
-      });
+    });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface, _Sequelize) => {
     await queryInterface.dropTable('PostCategories');
   }
 };

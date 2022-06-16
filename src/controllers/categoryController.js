@@ -1,24 +1,24 @@
-require('dotenv').config();
-const { Category } = require('../database/models');
+const service = require('../services/categoryService');
 
-async function createCategory(req, res, next) {
-  const { name } = req.body;
-
+async function create(req, res, next) {
   if (!req.body.name) {
     return next({ status: 400, message: '"name" is required' });
   } 
+  
+  const { name } = req.body;
 
-  const result = await Category.create({ name });
+  const created = await service.createCategory(name);
    
-  res.status(201).json(result);
+  res.status(201).json(created);
 }
 
-async function getAllCategories(req, res) {
-    const categories = await Category.findAll();
+async function getAll(_req, res) {
+    const categories = service.getAllCategories();
+
     res.status(200).json(categories);
 }
 
 module.exports = {
-  createCategory,
-  getAllCategories,
+  create,
+  getAll,
 };
