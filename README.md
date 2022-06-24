@@ -12,7 +12,7 @@
   - JSON Web Token
   - API Rest
   - MySQL
-  - MSD _(Model, Service, Controller)_
+  - MSC _(Model, Service, Controller)_
   - Middlewares
   - Joi
   - Express
